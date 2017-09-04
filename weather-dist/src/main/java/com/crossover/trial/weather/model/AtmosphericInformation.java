@@ -127,6 +127,30 @@ public class AtmosphericInformation {
                 && this.getPressure() == null && this.getTemperature() == null && this.getWind() == null;
     }
 
+    public AtmosphericInformation merge(AtmosphericInformation ai) {
+        if(ai.getCloudCover() != null) {
+            setCloudCover(ai.getCloudCover());
+        }
+        if(ai.getHumidity() != null) {
+            setHumidity(ai.getHumidity());
+        }
+        if(ai.getPrecipitation() != null) {
+            setPrecipitation(ai.getPrecipitation());
+        }
+        if(ai.getPressure() != null) {
+            setPressure(ai.getPressure());
+        }
+        if(ai.getPrecipitation() != null) {
+            setPrecipitation(ai.getPrecipitation());
+        }
+        if(ai.getWind() != null) {
+            setWind(ai.getWind());
+        }
+        setLastUpdateTime(System.currentTimeMillis());
+
+        return this;
+    }
+
     static public class Builder {
         private DataPoint temperature;
         private DataPoint wind;

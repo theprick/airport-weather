@@ -6,5 +6,11 @@
 - Added filter to update statistics.
 - Move the request numbers storage in separate component RequestFrequencyDataStore.
 - Added filters to update frequency.
-- Added Builder for AirportData
+- Added Builder for AirportData.
 - Modified AirportLoader.
+- Added add airport endpoint.
+- Added delete airport endpoint.
+- Added AtmosphericInformationFactory.
+- Merge the two maps from AirportDataStore.
+- Hold the AtmosphericInformation as AtomicReference.
+- Added custom exceptions.

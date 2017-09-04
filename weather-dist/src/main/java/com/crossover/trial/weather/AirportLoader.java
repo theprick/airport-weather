@@ -34,7 +34,7 @@ public class AirportLoader {
         collect = client.target("http://localhost:9090/collect");
     }
 
-    public void upload(InputStream airportDataStream) throws IOException{
+    private void upload(InputStream airportDataStream) throws IOException{
         BufferedReader reader = new BufferedReader(new InputStreamReader(airportDataStream));
         String line;
         // use StringTokenizer because is faster the split
@@ -62,7 +62,7 @@ public class AirportLoader {
                 .request()
                 .post(null);
 
-        if(response.getStatus() != 201) {
+        if(response.getStatus() != 200) {
             System.err.println("Failed to create airport data, status code " + response.getStatus());
         }
     }

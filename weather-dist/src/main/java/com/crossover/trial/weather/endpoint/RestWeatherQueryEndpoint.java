@@ -1,6 +1,6 @@
 package com.crossover.trial.weather.endpoint;
 
-import com.crossover.trial.weather.data.AtmosphericInformationDataStore;
+import com.crossover.trial.weather.data.AirportsDataStore;
 import com.crossover.trial.weather.data.RequestFrequencyDataStore;
 import com.crossover.trial.weather.interceptor.FrequencyUpdater;
 import com.crossover.trial.weather.model.AirportData;
@@ -31,12 +31,12 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
     public final static Logger LOGGER = Logger.getLogger("WeatherQuery");
 
     /** earth radius in KM */
-    public static final double R = 6372.8;
+    private static final double R = 6372.8;
 
     /** shared gson json to object factory */
-    public static final Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
-    private static AtmosphericInformationDataStore informationDataStore = AtmosphericInformationDataStore.getInstance();
+    private static AirportsDataStore informationDataStore = AirportsDataStore.getInstance();
 
     private static RequestFrequencyDataStore frequencyDataStore = RequestFrequencyDataStore.getInstance();
 
@@ -121,7 +121,7 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
             //if iata exists and radius == 0 return information coresponding for that airport
             AirportData airportData = informationDataStore.findAirportData(iata);
             if(airportData != null) {
-                retval.add(informationDataStore.findAtmosphericInformation(airportData.getIata()));
+                retval.add(informationDataStore.findAtmosphericInformation(airportData));
             } else {
                 retval.add(new AtmosphericInformation.Builder().build());
             }
@@ -129,7 +129,7 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
             AirportData ref = informationDataStore.findAirportData(iata);
             for(AirportData airportData : informationDataStore.listAirports()) {
                 if (calculateDistance(ref, airportData) <= radius){
-                    AtmosphericInformation ai = informationDataStore.findAtmosphericInformation(airportData.getIata());
+                    AtmosphericInformation ai = informationDataStore.findAtmosphericInformation(airportData);
                     if(!ai.isEmpty()) {
                         retval.add(ai);
                     }

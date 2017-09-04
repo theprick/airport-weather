@@ -27,8 +27,8 @@ public class RequestFrequencyDataStore {
     private final Object requestRadiusLock = new Object();
 
     private RequestFrequencyDataStore() {
-        requestFrequency = new ConcurrentHashMap<String, AtomicInteger>();
-        radiusFrequency = new ConcurrentHashMap<Double, AtomicInteger>();
+        requestFrequency = new ConcurrentHashMap<>();
+        radiusFrequency = new ConcurrentHashMap<>();
     }
 
     public static RequestFrequencyDataStore getInstance() {
@@ -89,15 +89,4 @@ public class RequestFrequencyDataStore {
     public int totalNumberOfRequests() {
         return requestFrequency.values().stream().mapToInt(AtomicInteger::intValue).sum();
     }
-
-
-//        requestFrequency.merge(iataCode, 1, Integer::sum);
-//        radiusFrequency.merge(radius, 1, Integer::sum);
-//
-//
-//    public static void main(String[] args) {
-//        AtomicInteger atomicInteger = new AtomicInteger(9);
-//        int a = atomicInteger.incrementAndGet();
-//        System.out.println(atomicInteger.toString());
-//    }
 }
