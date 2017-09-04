@@ -30,8 +30,8 @@ public class AirportLoader {
 
     public AirportLoader() {
         Client client = ClientBuilder.newClient();
-        query = client.target("http://localhost:8080/query");
-        collect = client.target("http://localhost:8080/collect");
+        query = client.target("http://localhost:9090/query");
+        collect = client.target("http://localhost:9090/collect");
     }
 
     public void upload(InputStream airportDataStream) throws IOException{
@@ -62,7 +62,7 @@ public class AirportLoader {
                 .request()
                 .post(null);
 
-        if(response.getStatus() != 202) {
+        if(response.getStatus() != 201) {
             System.err.println("Failed to create airport data, status code " + response.getStatus());
         }
     }
