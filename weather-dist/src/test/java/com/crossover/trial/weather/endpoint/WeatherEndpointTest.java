@@ -1,8 +1,15 @@
-package com.crossover.trial.weather;
+package com.crossover.trial.weather.endpoint;
 
+import com.crossover.trial.weather.endpoint.RestWeatherCollectorEndpoint;
+import com.crossover.trial.weather.endpoint.RestWeatherQueryEndpoint;
+import com.crossover.trial.weather.endpoint.WeatherCollectorEndpoint;
+import com.crossover.trial.weather.endpoint.WeatherQueryEndpoint;
+import com.crossover.trial.weather.model.AtmosphericInformation;
+import com.crossover.trial.weather.model.DataPoint;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,11 +60,22 @@ public class WeatherEndpointTest {
 
         List<AtmosphericInformation> ais = (List<AtmosphericInformation>) _query.weather("JFK", "200").getEntity();
         assertEquals(3, ais.size());
+        // added more assertions
+        checkAtmosphericInformation(new DataPoint.Builder()
+                .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(22).build(), ais);
+        checkAtmosphericInformation(new DataPoint.Builder()
+                .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(40).build(), ais);
+        checkAtmosphericInformation(new DataPoint.Builder()
+                .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(30).build(), ais);
+    }
+
+    private void checkAtmosphericInformation(DataPoint dataPoint, List<AtmosphericInformation> atmosphericInformationList) {
+        Assert.assertTrue(atmosphericInformationList.contains(
+                new AtmosphericInformation.Builder().withWind(dataPoint).build()));
     }
 
     @Test
     public void testUpdate() throws Exception {
-
         DataPoint windDp = new DataPoint.Builder()
                 .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(22).build();
         _update.updateWeather("BOS", "wind", _gson.toJson(windDp));

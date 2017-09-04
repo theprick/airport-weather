@@ -1,0 +1,10 @@
+- Fixed DataPoint, DataPoint.Builder, set private fields.
+- Added AtmosphericInformation.Builder.
+- Modified WeatherEndpointTest and added more assertions to show the logic bugs existing in the initial code.
+- Moved the airport and atmospheric data in a separate component AtmosphericInformationDataStore.
+- Removed the static methods that were called cris-cross between endpoints.
+- Added filter to update statistics.
+- Move the request numbers storage in separate component RequestFrequencyDataStore.
+- Added filters to update frequency.
+- Added Builder for AirportData
+- Modified AirportLoader.
