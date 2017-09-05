@@ -2,11 +2,15 @@ package com.crossover.trial.weather.endpoint;
 
 import com.crossover.trial.weather.data.AirportsDataStore;
 import com.crossover.trial.weather.model.*;
+import com.crossover.trial.weather.validation.DataPointWithType;
+import com.crossover.trial.weather.validation.generic.GenericInputRequestValidator;
+import com.crossover.trial.weather.validation.generic.InputValidationException;
 import com.google.gson.Gson;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -42,12 +46,15 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
                                   @PathParam("pointType") String pointType,
                                   String datapointJson) {
         try {
-            AirportData airportData = airportsDataStore.findAirportData(iataCode);
-            if(airportData != null) {
-                addDataPoint(airportData, pointType, gson.fromJson(datapointJson, DataPoint.class));
-            }
-        } catch (WeatherException e) {
-            e.printStackTrace();
+            new GenericInputRequestValidator().validate(
+                    Arrays.asList("iata", "dataPoint"),
+                    Arrays.asList(iataCode, new DataPointWithType(pointType, datapointJson)));
+        } catch (InputValidationException ex) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getErrors()).build();
+        }
+        AirportData airportData = airportsDataStore.findAirportData(iataCode);
+        if (airportData != null) {
+            addDataPoint(airportData, pointType, gson.fromJson(datapointJson, DataPoint.class));
         }
         return Response.status(Response.Status.OK).build();
     }
@@ -106,12 +113,11 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     /**
      * Update the airports weather data with the collected data.
      *
-     * @param airportData  airport data
-     * @param pointType the point type {@link DataPointType}
-     * @param dataPoint a datapoint object holding pointType data
-     * @throws WeatherException if the update can not be completed
+     * @param airportData airport data
+     * @param pointType   the point type {@link DataPointType}
+     * @param dataPoint   a datapoint object holding pointType data
      */
-    private void addDataPoint(AirportData airportData, String pointType, DataPoint dataPoint) throws WeatherException {
+    private void addDataPoint(AirportData airportData, String pointType, DataPoint dataPoint) {
         AtmosphericInformation newInfo =
                 new AtmosphericInformationFactory().getAtmosphericInformation(DataPointType.valueOf(pointType.toUpperCase()), dataPoint);
         airportsDataStore.updateDataPoint(airportData, newInfo);

@@ -97,9 +97,8 @@ public class AirportsDataStore {
 
     public void updateDataPoint(AirportData airportData, AtmosphericInformation newInfo) {
         AtomicReference<AtmosphericInformation> currentInfo = atmosphericInformationForAirportData.get(airportData);
-        if (currentInfo == null) {
-            throw new WeatherException("IATA code " + airportData.getIata() + "not present in the data store");
+        if (currentInfo != null) {
+            currentInfo.getAndAccumulate(newInfo, AtmosphericInformation::merge);
         }
-        currentInfo.getAndAccumulate(newInfo, AtmosphericInformation::merge);
     }
 }

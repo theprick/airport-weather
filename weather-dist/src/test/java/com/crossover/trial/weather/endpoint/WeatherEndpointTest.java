@@ -26,6 +26,7 @@ public class WeatherEndpointTest {
     private Gson _gson = new Gson();
 
     private DataPoint _dp;
+
     @Before
     public void setUp() throws Exception {
         RestWeatherQueryEndpoint.init();
@@ -93,5 +94,4 @@ public class WeatherEndpointTest {
         assertEquals(expectedWindDp, ais.get(0).getWind());
         assertEquals(expectedCloudCoverDp, ais.get(0).getCloudCover());
     }
-
 }
