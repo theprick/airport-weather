@@ -1,22 +1,23 @@
 package com.crossover.trial.weather.endpoint;
 
-import com.crossover.trial.weather.data.InformationDataStore;
 import com.crossover.trial.weather.data.FrequencyDataStore;
+import com.crossover.trial.weather.data.InformationDataStore;
 import com.crossover.trial.weather.interceptor.FrequencyUpdater;
 import com.crossover.trial.weather.model.AirportData;
 import com.crossover.trial.weather.model.AtmosphericInformation;
+import com.crossover.trial.weather.validation.generic.Error;
+import com.crossover.trial.weather.validation.generic.GenericInputRequestValidator;
+import com.crossover.trial.weather.validation.generic.InputValidationException;
 import com.google.gson.Gson;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -100,7 +101,7 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
      * Given a query in json format {'iata': CODE, 'radius': km} extracts the requested airport information and
      * return a list of matching atmosphere information.
      *
-     * @param iata the iataCode
+     * @param iataCode the iataCode
      * @param radiusString the radius in km
      *
      * @return a list of atmospheric information
@@ -110,20 +111,29 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
     @Path("/weather/{iata}/{radius}")
     @Produces(MediaType.APPLICATION_JSON)
     @FrequencyUpdater
-    public Response weather(@PathParam("iata") String iata, @PathParam("radius") String radiusString) {
+    public Response weather(@PathParam("iata") String iataCode, @PathParam("radius") String radiusString) {
+        try {
+            new GenericInputRequestValidator().validate(
+                    Arrays.asList("iata", "radius"),
+                    Arrays.asList(iataCode, radiusString));
+        } catch (InputValidationException ex) {
+            GenericEntity<List<Error>> errors = new GenericEntity<List<Error>>(ex.getErrors()){};
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
+
         double radius = radiusString == null || radiusString.trim().isEmpty() ? 0 : Double.valueOf(radiusString);
 
         List<AtmosphericInformation> retval = new ArrayList<>();
         if (radius == 0) {
             //if iata exists and radius == 0 return information coresponding for that airport
-            AirportData airportData = informationDataStore.findAirportData(iata);
+            AirportData airportData = informationDataStore.findAirportData(iataCode);
             if(airportData != null) {
                 retval.add(informationDataStore.findAtmosphericInformation(airportData));
             } else {
                 retval.add(new AtmosphericInformation.Builder().build());
             }
         } else {
-            AirportData ref = informationDataStore.findAirportData(iata);
+            AirportData ref = informationDataStore.findAirportData(iataCode);
             for(AirportData airportData : informationDataStore.listAirports()) {
                 if (calculateDistance(ref, airportData) <= radius){
                     AtmosphericInformation ai = informationDataStore.findAtmosphericInformation(airportData);

@@ -13,11 +13,10 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import static org.glassfish.grizzly.http.util.Header.Accept;
 
 /**
  * A REST implementation of the WeatherCollector API. Accessible only to airport weather collection
@@ -80,18 +79,34 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     @GET
     @Path("/airport/{iata}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAirport(@PathParam("iata") String iata) {
-        AirportData ad = informationDataStore.findAirportData(iata);
+    public Response getAirport(@PathParam("iata") String iataCode) {
+        try {
+            new GenericInputRequestValidator().validate(
+                    Collections.singletonList("iata"),
+                    Collections.singletonList(iataCode));
+        } catch (InputValidationException ex) {
+            GenericEntity<List<Error>> errors = new GenericEntity<List<Error>>(ex.getErrors()){};
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
+        AirportData ad = informationDataStore.findAirportData(iataCode);
         return Response.status(Response.Status.OK).entity(ad).build();
     }
 
     @Override
     @POST
     @Path("/airport/{iata}/{lat}/{long}")
-    public Response addAirport(@PathParam("iata") String iata,
+    public Response addAirport(@PathParam("iata") String iataCode,
                                @PathParam("lat") String latString,
                                @PathParam("long") String longString) {
-        AirportData airportData = new AirportData.Builder().withIata(iata)
+        try {
+            new GenericInputRequestValidator().validate(
+                    Arrays.asList("iata", "lat", "long"),
+                    Arrays.asList(iataCode, latString, longString));
+        } catch (InputValidationException ex) {
+            GenericEntity<List<Error>> errors = new GenericEntity<List<Error>>(ex.getErrors()){};
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
+        AirportData airportData = new AirportData.Builder().withIata(iataCode)
                 .withLatitude(Double.valueOf(latString))
                 .withLongitude(Double.valueOf(longString)).build();
         informationDataStore.addAirport(airportData);
@@ -101,8 +116,16 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     @Override
     @DELETE
     @Path("/airport/{iata}")
-    public Response deleteAirport(@PathParam("iata") String iata) {
-        informationDataStore.deleteAirport(iata);
+    public Response deleteAirport(@PathParam("iata") String iataCode) {
+        try {
+            new GenericInputRequestValidator().validate(
+                    Collections.singletonList("iata"),
+                    Collections.singletonList(iataCode));
+        } catch (InputValidationException ex) {
+            GenericEntity<List<Error>> errors = new GenericEntity<List<Error>>(ex.getErrors()){};
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
+        informationDataStore.deleteAirport(iataCode);
         return Response.status(Response.Status.OK).build();
     }
 

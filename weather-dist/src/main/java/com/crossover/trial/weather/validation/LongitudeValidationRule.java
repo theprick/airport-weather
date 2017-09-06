@@ -31,6 +31,6 @@ public class LongitudeValidationRule extends ValidationRule {
 
     @Override
     public String parameterName() {
-        return "longitude";
+        return "long";
     }
 }

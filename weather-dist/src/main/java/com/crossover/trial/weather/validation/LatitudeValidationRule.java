@@ -9,6 +9,6 @@ public class LatitudeValidationRule extends LongitudeValidationRule {
 
     @Override
     public String parameterName() {
-        return "latitude";
+        return "lat";
     }
 }
