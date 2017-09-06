@@ -14,6 +14,7 @@ import static com.crossover.trial.weather.validation.generic.ErrorCode.INVALID_V
 
 /**
  * Created by Popescu Adrian-Dumitru on 06.09.2017.
+ *
  */
 public class DataPointValidationRule extends ValidationRule {
 
@@ -32,13 +33,14 @@ public class DataPointValidationRule extends ValidationRule {
         DataPointWithType dataPointWithType = (DataPointWithType) obj;
         List<Error> errors = new ArrayList<>();
         try {
-            DataPoint dataPoint = gson.fromJson(dataPointWithType.getDataPointJson(), DataPoint.class);
             DataPointType dataPointType = parsePointType(dataPointWithType.getDataPointType(), errors);
+            DataPoint dataPoint = gson.fromJson(dataPointWithType.getDataPointJson(), DataPoint.class);
             if(dataPointType != null) {
                 validateDataPoint(dataPoint, dataPointType, errors);
             }
-        } catch (JsonSyntaxException ex) {
-            errors.add(new Error(INVALID_VALUE, "dataPoint", ""));
+            //FIXME refine DataPoint validation
+        } catch (Exception ex) {
+            errors.add(new Error(INVALID_VALUE, "dataPoint", "Data point has invalid structure"));
         }
         return errors;
     }

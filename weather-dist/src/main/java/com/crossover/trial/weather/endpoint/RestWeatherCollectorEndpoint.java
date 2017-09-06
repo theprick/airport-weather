@@ -3,16 +3,21 @@ package com.crossover.trial.weather.endpoint;
 import com.crossover.trial.weather.data.InformationDataStore;
 import com.crossover.trial.weather.model.*;
 import com.crossover.trial.weather.validation.DataPointWithType;
+import com.crossover.trial.weather.validation.generic.Error;
 import com.crossover.trial.weather.validation.generic.GenericInputRequestValidator;
 import com.crossover.trial.weather.validation.generic.InputValidationException;
 import com.google.gson.Gson;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import static org.glassfish.grizzly.http.util.Header.Accept;
 
 /**
  * A REST implementation of the WeatherCollector API. Accessible only to airport weather collection
@@ -41,6 +46,8 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
 
     @Override
     @POST
+    @Consumes("application/json")
+    @Produces("application/json")
     @Path("/weather/{iata}/{pointType}")
     public Response updateWeather(@PathParam("iata") String iataCode,
                                   @PathParam("pointType") String pointType,
@@ -50,7 +57,8 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
                     Arrays.asList("iata", "dataPoint"),
                     Arrays.asList(iataCode, new DataPointWithType(pointType, datapointJson)));
         } catch (InputValidationException ex) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getErrors()).build();
+            GenericEntity<List<Error>> errors = new GenericEntity<List<Error>>(ex.getErrors()){};
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
         AirportData airportData = informationDataStore.findAirportData(iataCode);
         if (airportData != null) {
