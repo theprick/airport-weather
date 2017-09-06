@@ -14,9 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * we don't want to write this to disk, but will pull it off using a REST request and aggregate with other
  * performance metrics {@link com.crossover.trial.weather.endpoint.WeatherQueryEndpoint#ping()}
  */
-public class RequestFrequencyDataStore {
+public class FrequencyDataStore {
 
-    private volatile static RequestFrequencyDataStore instance;
+    private volatile static FrequencyDataStore instance;
 
     private final Map<String, AtomicInteger> requestFrequency;
 
@@ -26,16 +26,16 @@ public class RequestFrequencyDataStore {
 
     private final Object requestRadiusLock = new Object();
 
-    private RequestFrequencyDataStore() {
+    private FrequencyDataStore() {
         requestFrequency = new ConcurrentHashMap<>();
         radiusFrequency = new ConcurrentHashMap<>();
     }
 
-    public static RequestFrequencyDataStore getInstance() {
+    public static FrequencyDataStore getInstance() {
         if(instance == null) {
-            synchronized (RequestFrequencyDataStore.class) {
+            synchronized (FrequencyDataStore.class) {
                 if(instance == null) {
-                    instance = new RequestFrequencyDataStore();
+                    instance = new FrequencyDataStore();
                 }
             }
         }

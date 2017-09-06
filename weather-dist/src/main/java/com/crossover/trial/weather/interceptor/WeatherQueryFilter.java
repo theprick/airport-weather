@@ -1,6 +1,6 @@
 package com.crossover.trial.weather.interceptor;
 
-import com.crossover.trial.weather.data.RequestFrequencyDataStore;
+import com.crossover.trial.weather.data.FrequencyDataStore;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -24,7 +24,7 @@ public class WeatherQueryFilter implements ContainerResponseFilter {
         String iata = pathParameters.getFirst("iata");
         Double radius = Double.valueOf(pathParameters.getFirst("radius"));
 
-        RequestFrequencyDataStore frequencyDataStore = RequestFrequencyDataStore.getInstance();
+        FrequencyDataStore frequencyDataStore = FrequencyDataStore.getInstance();
         frequencyDataStore.updateRequestFrequency(iata);
         frequencyDataStore.updateRadiusFrequency(radius);
     }

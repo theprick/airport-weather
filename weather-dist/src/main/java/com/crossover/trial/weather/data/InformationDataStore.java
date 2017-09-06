@@ -15,24 +15,24 @@ import java.util.stream.Collectors;
  * <p>
  * My data store with airports and atmospheric information stored in memory and shared globally for all application
  */
-public class AirportsDataStore {
+public class InformationDataStore {
 
-    private volatile static AirportsDataStore instance;
+    private volatile static InformationDataStore instance;
 
     /**
      * atmospheric information for each airport based on iata code
      */
     private final ConcurrentHashMap<AirportData, AtomicReference<AtmosphericInformation>> atmosphericInformationForAirportData;
 
-    private AirportsDataStore() {
+    private InformationDataStore() {
         atmosphericInformationForAirportData = new ConcurrentHashMap<>();
     }
 
-    public static AirportsDataStore getInstance() {
+    public static InformationDataStore getInstance() {
         if (instance == null) {
-            synchronized (AirportsDataStore.class) {
+            synchronized (InformationDataStore.class) {
                 if (instance == null) {
-                    instance = new AirportsDataStore();
+                    instance = new InformationDataStore();
                 }
             }
         }

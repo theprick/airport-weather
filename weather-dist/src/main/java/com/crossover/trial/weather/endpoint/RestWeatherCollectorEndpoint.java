@@ -1,6 +1,6 @@
 package com.crossover.trial.weather.endpoint;
 
-import com.crossover.trial.weather.data.AirportsDataStore;
+import com.crossover.trial.weather.data.InformationDataStore;
 import com.crossover.trial.weather.model.*;
 import com.crossover.trial.weather.validation.DataPointWithType;
 import com.crossover.trial.weather.validation.generic.GenericInputRequestValidator;
@@ -29,8 +29,8 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     //shared gson json to object factory
     private final static Gson gson = new Gson();
 
-    private static AirportsDataStore airportsDataStore
-            = AirportsDataStore.getInstance();
+    private static InformationDataStore informationDataStore
+            = InformationDataStore.getInstance();
 
     @Override
     @GET
@@ -52,7 +52,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
         } catch (InputValidationException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getErrors()).build();
         }
-        AirportData airportData = airportsDataStore.findAirportData(iataCode);
+        AirportData airportData = informationDataStore.findAirportData(iataCode);
         if (airportData != null) {
             addDataPoint(airportData, pointType, gson.fromJson(datapointJson, DataPoint.class));
         }
@@ -64,7 +64,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     @Path("/airports")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAirports() {
-        Set<String> airports = airportsDataStore.listAirportIataCodes();
+        Set<String> airports = informationDataStore.listAirportIataCodes();
         return Response.status(Response.Status.OK).entity(airports).build();
     }
 
@@ -73,7 +73,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     @Path("/airport/{iata}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAirport(@PathParam("iata") String iata) {
-        AirportData ad = airportsDataStore.findAirportData(iata);
+        AirportData ad = informationDataStore.findAirportData(iata);
         return Response.status(Response.Status.OK).entity(ad).build();
     }
 
@@ -86,7 +86,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
         AirportData airportData = new AirportData.Builder().withIata(iata)
                 .withLatitude(Double.valueOf(latString))
                 .withLongitude(Double.valueOf(longString)).build();
-        airportsDataStore.addAirport(airportData);
+        informationDataStore.addAirport(airportData);
         return Response.status(Response.Status.OK).build();
     }
 
@@ -94,7 +94,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     @DELETE
     @Path("/airport/{iata}")
     public Response deleteAirport(@PathParam("iata") String iata) {
-        airportsDataStore.deleteAirport(iata);
+        informationDataStore.deleteAirport(iata);
         return Response.status(Response.Status.OK).build();
     }
 
@@ -120,7 +120,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     private void addDataPoint(AirportData airportData, String pointType, DataPoint dataPoint) {
         AtmosphericInformation newInfo =
                 new AtmosphericInformationFactory().getAtmosphericInformation(DataPointType.valueOf(pointType.toUpperCase()), dataPoint);
-        airportsDataStore.updateDataPoint(airportData, newInfo);
+        informationDataStore.updateDataPoint(airportData, newInfo);
     }
 }
 

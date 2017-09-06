@@ -1,7 +1,7 @@
 package com.crossover.trial.weather.endpoint;
 
-import com.crossover.trial.weather.data.AirportsDataStore;
-import com.crossover.trial.weather.data.RequestFrequencyDataStore;
+import com.crossover.trial.weather.data.InformationDataStore;
+import com.crossover.trial.weather.data.FrequencyDataStore;
 import com.crossover.trial.weather.interceptor.FrequencyUpdater;
 import com.crossover.trial.weather.model.AirportData;
 import com.crossover.trial.weather.model.AtmosphericInformation;
@@ -36,13 +36,10 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
     /** shared gson json to object factory */
     private static final Gson gson = new Gson();
 
-    private static AirportsDataStore informationDataStore = AirportsDataStore.getInstance();
+    private static InformationDataStore informationDataStore = InformationDataStore.getInstance();
 
-    private static RequestFrequencyDataStore frequencyDataStore = RequestFrequencyDataStore.getInstance();
+    private static FrequencyDataStore frequencyDataStore = FrequencyDataStore.getInstance();
 
-    static {
-        init();
-    }
     /**
      * Retrieve service health including total size of valid data points and request frequency information.
      *
@@ -153,24 +150,5 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
                 * Math.cos(ad1.getLatitude()) * Math.cos(ad2.getLatitude());
         double c = 2 * Math.asin(Math.sqrt(a));
         return R * c;
-    }
-
-    /**
-     * A dummy init method that loads hard coded data
-     */
-    public static void init() {
-        informationDataStore.clear();
-        frequencyDataStore.clear();
-
-        informationDataStore.addAirport(
-                new AirportData.Builder().withIata("BOS").withLatitude(42.364347).withLongitude(-71.005181).build());
-        informationDataStore.addAirport(
-                new AirportData.Builder().withIata("EWR").withLatitude(40.6925).withLongitude(-74.168667).build());
-        informationDataStore.addAirport(
-                new AirportData.Builder().withIata("JFK").withLatitude(40.639751).withLongitude(-73.778925).build());
-        informationDataStore.addAirport(
-                new AirportData.Builder().withIata("LGA").withLatitude(40.777245).withLongitude(-73.872608).build());
-        informationDataStore.addAirport(
-                new AirportData.Builder().withIata("MMU").withLatitude(40.79935).withLongitude(-74.4148747).build());
     }
 }
