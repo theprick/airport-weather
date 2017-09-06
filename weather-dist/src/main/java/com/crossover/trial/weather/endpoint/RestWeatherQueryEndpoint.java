@@ -87,7 +87,7 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
         int[] hist = new int[m];
 
         for(Double radius : frequencyDataStore.listRadii()) {
-            int i = radius.intValue() % 10;
+            int i = radius.intValue() / 10;
             hist[i] += frequencyDataStore.getRadiusFrequency(radius);
         }
 

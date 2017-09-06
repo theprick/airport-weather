@@ -5,7 +5,6 @@ import com.crossover.trial.weather.model.DataPointType;
 import com.crossover.trial.weather.validation.generic.Error;
 import com.crossover.trial.weather.validation.generic.ValidationRule;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -22,9 +22,9 @@ public class FrequencyDataStore {
 
     private final Map<Double, AtomicInteger> radiusFrequency;
 
-    private final Object requestFrequencytLock = new Object();
+    private final Object requestsLock = new Object();
 
-    private final Object requestRadiusLock = new Object();
+    private final Object radiusLock = new Object();
 
     private FrequencyDataStore() {
         requestFrequency = new ConcurrentHashMap<>();
@@ -44,23 +44,15 @@ public class FrequencyDataStore {
     }
 
     public void updateRequestFrequency(String iataCode) {
-        AtomicInteger atomicInt;
-        synchronized (requestFrequencytLock) {
-            atomicInt = requestFrequency.get(iataCode);
-            if (atomicInt == null) {
-                requestFrequency.put(iataCode, new AtomicInteger(1));
-            }
+        synchronized (requestsLock) {
+            requestFrequency.computeIfAbsent(iataCode, k -> new AtomicInteger(0));
         }
         requestFrequency.get(iataCode).incrementAndGet();
     }
 
     public void updateRadiusFrequency(Double radius) {
-        AtomicInteger atomicInteger;
-        synchronized (requestRadiusLock) {
-            atomicInteger = radiusFrequency.get(radius);
-            if (atomicInteger == null) {
-                radiusFrequency.put(radius, new AtomicInteger(1));
-            }
+        synchronized (radiusLock) {
+            radiusFrequency.computeIfAbsent(radius, k -> new AtomicInteger(0));
         }
         radiusFrequency.get(radius).incrementAndGet();
     }
