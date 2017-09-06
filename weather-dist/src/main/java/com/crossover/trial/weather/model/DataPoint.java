@@ -26,7 +26,7 @@ public class DataPoint {
     private DataPoint() {
     }
 
-    private DataPoint(int first, int second, int third, int mean, int count) {
+    private DataPoint(int first, int second, int third, double mean, int count) {
         this.setFirst(first);
         this.setSecond(second);
         this.setThird(third);
@@ -101,7 +101,7 @@ public class DataPoint {
         private int first;
         private int median;
         private int last;
-        private int mean;
+        private double mean;
         private int count;
 
         public Builder() {
@@ -112,7 +112,7 @@ public class DataPoint {
             return this;
         }
 
-        public Builder withMean(int mean) {
+        public Builder withMean(double mean) {
             this.mean = mean;
             return this;
         }

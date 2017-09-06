@@ -13,7 +13,7 @@ import static com.crossover.trial.weather.validation.generic.ErrorCode.INVALID_V
 
 /**
  * Created by Popescu Adrian-Dumitru on 06.09.2017.
- *
+ * Encapsulate validation for data point based on the data point type
  */
 public class DataPointValidationRule extends ValidationRule {
 
@@ -63,7 +63,7 @@ public class DataPointValidationRule extends ValidationRule {
                 break;
             case TEMPERATURE:
                 if (dataPoint.getMean() < -50 || dataPoint.getMean() >= 100) {
-                    errors.add(new Error(INVALID_VALUE, "mean", "Mean must by a decimal number between -50 and 100"));
+                    errors.add(new Error(INVALID_VALUE, "mean", "Mean must by a decimal number between -50 and 99"));
                 }
                 break;
             case PRESSURE:
@@ -84,13 +84,13 @@ public class DataPointValidationRule extends ValidationRule {
             errors.add(new Error(INVALID_VALUE, "first", "First must by an integer greater or equal to 0"));
         }
         if(dataPoint.getSecond()<0) {
-            errors.add(new Error(INVALID_VALUE, "second", "First must by an integer greater or equal to 0"));
+            errors.add(new Error(INVALID_VALUE, "second", "Second must by an integer greater or equal to 0"));
         }
         if(dataPoint.getThird()<0) {
-            errors.add(new Error(INVALID_VALUE, "third", "First must by an integer greater or equal to 0"));
+            errors.add(new Error(INVALID_VALUE, "third", "Third must by an integer greater or equal to 0"));
         }
         if(dataPoint.getCount()<0) {
-            errors.add(new Error(INVALID_VALUE, "count", "First must by an integer greater or equal to 0"));
+            errors.add(new Error(INVALID_VALUE, "count", "Count must by an integer greater or equal to 0"));
         }
     }
 }

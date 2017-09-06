@@ -92,6 +92,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
         return Response.status(Response.Status.OK).entity(ad).build();
     }
 
+    @Produces("application/json")
     @Override
     @POST
     @Path("/airport/{iata}/{lat}/{long}")
@@ -113,6 +114,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
         return Response.status(Response.Status.OK).build();
     }
 
+    @Produces("application/json")
     @Override
     @DELETE
     @Path("/airport/{iata}")

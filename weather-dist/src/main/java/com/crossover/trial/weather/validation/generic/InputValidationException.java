@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Created by Popescu Adrian-Dumitru on 05.09.2017.
- *
+ * Custom validation exception.
  */
 public class InputValidationException extends Throwable {
 

@@ -11,6 +11,7 @@ import java.io.IOException;
 
 /**
  * Created by Popescu Adrian-Dumitru on 03.09.2017.
+ *
  * Filter used to record information about how often requests are made.
  */
 @Provider

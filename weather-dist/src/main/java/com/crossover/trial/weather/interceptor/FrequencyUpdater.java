@@ -10,6 +10,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Created by Popescu Adrian-Dumitru on 03.09.2017.
+ *
  * Annotation used to bind {@link WeatherQueryFilter} to method
  * {@link com.crossover.trial.weather.endpoint.WeatherQueryEndpoint#weather(String, String)}
  *

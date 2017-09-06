@@ -1,14 +1,10 @@
 package com.crossover.trial.weather.endpoint;
 
-import com.crossover.trial.weather.data.FrequencyDataStore;
-import com.crossover.trial.weather.data.InformationDataStore;
-import com.crossover.trial.weather.endpoint.RestWeatherCollectorEndpoint;
-import com.crossover.trial.weather.endpoint.RestWeatherQueryEndpoint;
-import com.crossover.trial.weather.endpoint.WeatherCollectorEndpoint;
-import com.crossover.trial.weather.endpoint.WeatherQueryEndpoint;
-import com.crossover.trial.weather.model.AirportData;
+import com.crossover.trial.weather.TestUtils;
 import com.crossover.trial.weather.model.AtmosphericInformation;
 import com.crossover.trial.weather.model.DataPoint;
+import com.crossover.trial.weather.model.DataPointType;
+import com.crossover.trial.weather.validation.generic.Error;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -16,8 +12,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static com.crossover.trial.weather.validation.generic.ErrorCode.INVALID_VALUE;
+import static com.crossover.trial.weather.validation.generic.ErrorCode.MISSING_PARAMETER;
 import static org.junit.Assert.assertEquals;
 
 public class WeatherEndpointTest {
@@ -32,8 +33,7 @@ public class WeatherEndpointTest {
 
     @Before
     public void setUp() throws Exception {
-        init();
-//        RestWeatherQueryEndpoint.init();
+        TestUtils.init();
         _dp = new DataPoint.Builder()
                 .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(22).build();
         _update.updateWeather("BOS", "wind", _gson.toJson(_dp));
@@ -52,6 +52,31 @@ public class WeatherEndpointTest {
     public void testGet() throws Exception {
         List<AtmosphericInformation> ais = (List<AtmosphericInformation>) _query.weather("BOS", "0").getEntity();
         assertEquals(ais.get(0).getWind(), _dp);
+    }
+
+    @Test
+    public void testGetInvalid() {
+        Response response = _query.weather("invalid", "-1");
+        List<Error> errors = (List<Error>)response.getEntity();
+        assertEquals(400, response.getStatus());
+        assertEquals(
+                Arrays.asList(
+                        new Error(INVALID_VALUE, "iata", "The iata code is formed of 3 upper case letters"),
+                        new Error(INVALID_VALUE, "radius","The parameter must be a valid decimal number greater or equal to 0")
+                ),
+                errors);
+    }
+
+    @Test
+    public void testGetNull() {
+        Response response = _query.weather(null, null);
+        List<Error> errors = (List<Error>)response.getEntity();
+        assertEquals(400, response.getStatus());
+        assertEquals(
+                Collections.singletonList(
+                        new Error(MISSING_PARAMETER, "iata", "The parameter is mandatory")
+                ),
+                errors);
     }
 
     @Test
@@ -80,7 +105,7 @@ public class WeatherEndpointTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    public void testUpdateWeather() throws Exception {
         DataPoint expectedWindDp = new DataPoint.Builder()
                 .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(22).build();
         _update.updateWeather("BOS", "wind", _gson.toJson(expectedWindDp));
@@ -99,22 +124,31 @@ public class WeatherEndpointTest {
         assertEquals(expectedCloudCoverDp, ais.get(0).getCloudCover());
     }
 
-    /**
-     * A dummy init method that loads hard coded data
-     */
-    private static void init() {
-        InformationDataStore.getInstance().clear();
-        FrequencyDataStore.getInstance().clear();
+    @Test
+    public void testUpdateWeatherInvalidInput() {
+        Response response = _update.updateWeather("invalid", "invalid", "invalid");
+        List<Error> errors = (List<Error>)response.getEntity();
+        assertEquals(400, response.getStatus());
+        assertEquals(
+                Arrays.asList(
+                    new Error(INVALID_VALUE, "iata", "The iata code is formed of 3 upper case letters"),
+                        new Error(INVALID_VALUE, "pointType",
+                                "The parameter must have one of the following values: " + Arrays.asList(DataPointType.values()) + " with upper or lower case"),
+                        new Error(INVALID_VALUE, "dataPoint", "Data point has invalid structure")
+                ),
+                errors);
+    }
 
-        InformationDataStore.getInstance().addAirport(
-                new AirportData.Builder().withIata("BOS").withLatitude(42.364347).withLongitude(-71.005181).build());
-        InformationDataStore.getInstance().addAirport(
-                new AirportData.Builder().withIata("EWR").withLatitude(40.6925).withLongitude(-74.168667).build());
-        InformationDataStore.getInstance().addAirport(
-                new AirportData.Builder().withIata("JFK").withLatitude(40.639751).withLongitude(-73.778925).build());
-        InformationDataStore.getInstance().addAirport(
-                new AirportData.Builder().withIata("LGA").withLatitude(40.777245).withLongitude(-73.872608).build());
-        InformationDataStore.getInstance().addAirport(
-                new AirportData.Builder().withIata("MMU").withLatitude(40.79935).withLongitude(-74.4148747).build());
+    @Test
+    public void testUpdateWeatherNullInput() {
+        Response response = _update.updateWeather(null, null, null);
+        List<Error> errors = (List<Error>)response.getEntity();
+        assertEquals(400, response.getStatus());
+        assertEquals(
+                Arrays.asList(
+                        new Error(MISSING_PARAMETER, "iata", "The parameter is mandatory"),
+                        new Error(MISSING_PARAMETER, "pointType","The parameter is mandatory")
+                ),
+                errors);
     }
 }

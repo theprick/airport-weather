@@ -27,7 +27,7 @@ public class DataPointTypeValidationRule extends ValidationRule {
             DataPointType.valueOf(String.valueOf(param).toUpperCase());
         } catch (IllegalArgumentException ex) {
             return  Collections.singletonList(new Error(INVALID_VALUE, parameterName(),
-                    "The parameter must have one of the following values: " + Arrays.asList(DataPointType.values())));
+                    "The parameter must have one of the following values: " + Arrays.asList(DataPointType.values()) + " with upper or lower case"));
         }
         return null;
     }
