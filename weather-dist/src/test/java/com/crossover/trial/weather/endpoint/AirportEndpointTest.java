@@ -107,6 +107,19 @@ public class AirportEndpointTest {
     }
 
     @Test
+    public void testDeleteAirportNonExisting() {
+        assertItem("BOS", 42.364347, -71.005181);
+        Response response = _update.deleteAirport("bos");
+        assertEquals(200, response.getStatus());
+
+        response = _update.getAirport("BOS");
+        assertEquals(404, response.getStatus());
+
+        response = _update.deleteAirport("bos");
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
     public void testAddAirport() {
         assertList(new HashSet<>(Arrays.asList("BOS", "EWR", "JFK", "LGA", "MMU")));
 

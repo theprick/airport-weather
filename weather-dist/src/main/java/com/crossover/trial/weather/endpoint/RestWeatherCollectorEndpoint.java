@@ -55,6 +55,9 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     public Response updateWeather(@PathParam("iata") String iataCode,
                                   @PathParam("pointType") String pointType,
                                   String datapointJson) {
+        if(iataCode != null) {
+            iataCode = iataCode.toUpperCase();
+        }
         try {
             new GenericInputRequestValidator().validate(
                     Arrays.asList("iata", "dataPoint"),
@@ -86,6 +89,9 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     @Path("/airport/{iata}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAirport(@PathParam("iata") String iataCode) {
+        if(iataCode != null) {
+            iataCode = iataCode.toUpperCase();
+        }
         try {
             new GenericInputRequestValidator().validate(
                     Collections.singletonList("iata"),
@@ -109,6 +115,9 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     public Response addAirport(@PathParam("iata") String iataCode,
                                @PathParam("lat") String latString,
                                @PathParam("long") String longString) {
+        if(iataCode != null) {
+            iataCode = iataCode.toUpperCase();
+        }
         try {
             new GenericInputRequestValidator().validate(
                     Arrays.asList("iata", "lat", "long"),
@@ -129,6 +138,9 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     @DELETE
     @Path("/airport/{iata}")
     public Response deleteAirport(@PathParam("iata") String iataCode) {
+        if(iataCode != null) {
+            iataCode = iataCode.toUpperCase();
+        }
         try {
             new GenericInputRequestValidator().validate(
                     Collections.singletonList("iata"),

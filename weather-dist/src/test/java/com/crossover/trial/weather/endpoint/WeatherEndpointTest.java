@@ -13,13 +13,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.crossover.trial.weather.validation.generic.ErrorCode.INVALID_VALUE;
 import static com.crossover.trial.weather.validation.generic.ErrorCode.MISSING_PARAMETER;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class WeatherEndpointTest {
 
@@ -80,7 +80,7 @@ public class WeatherEndpointTest {
     }
 
     @Test
-    public void testGetNearby() throws Exception {
+    public void testGetNearby() {
         // check datasize response
         _update.updateWeather("JFK", "wind", _gson.toJson(_dp));
         _dp.setMean(40);
@@ -105,7 +105,21 @@ public class WeatherEndpointTest {
     }
 
     @Test
-    public void testUpdateWeather() throws Exception {
+    public void testGetWeatherNonExistingAirport() {
+        HashSet<String> airports = new HashSet<>(Arrays.asList("BOS", "EWR", "JFK", "LGA", "MMU"));
+        assertList(airports);
+        String nonExistentCode = "XYZ";
+        assertFalse(airports.contains(nonExistentCode));
+
+        Response response = _query.weather(nonExistentCode, "0");
+        assertEquals(404, response.getStatus());
+
+        response = _query.weather(nonExistentCode, "10");
+        assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    public void testUpdateWeather() {
         DataPoint expectedWindDp = new DataPoint.Builder()
                 .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(22).build();
         _update.updateWeather("BOS", "wind", _gson.toJson(expectedWindDp));
@@ -122,6 +136,24 @@ public class WeatherEndpointTest {
         List<AtmosphericInformation> ais = (List<AtmosphericInformation>) _query.weather("BOS", "0").getEntity();
         assertEquals(expectedWindDp, ais.get(0).getWind());
         assertEquals(expectedCloudCoverDp, ais.get(0).getCloudCover());
+    }
+
+
+    @Test
+    public void testUpdateWeatherNonExistenAirport(){
+        HashSet<String> airports = new HashSet<>(Arrays.asList("BOS", "EWR", "JFK", "LGA", "MMU"));
+        assertList(airports);
+        String nonExistentCode = "XYZ";
+        assertFalse(airports.contains(nonExistentCode));
+
+        Response response =  _update.updateWeather(
+                nonExistentCode,
+                DataPointType.WIND.name(),
+                _gson.toJson(
+                        new DataPoint.Builder()
+                                .withCount(10).withFirst(10).withMedian(20).withLast(30).withMean(22).build())
+        );
+        assertEquals(404, response.getStatus());
     }
 
     @Test
@@ -151,4 +183,12 @@ public class WeatherEndpointTest {
                 ),
                 errors);
     }
+
+    private void assertList(Set<String> expected) {
+        Response response = _update.getAirports();
+        assertEquals(200, response.getStatus());
+        Set<String> airports = (Set<String>) response.getEntity();
+        assertEquals(expected, airports);
+    }
+
 }

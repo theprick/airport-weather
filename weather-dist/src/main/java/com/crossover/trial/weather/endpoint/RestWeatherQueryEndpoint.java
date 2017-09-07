@@ -112,6 +112,9 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @FrequencyUpdater
     public Response weather(@PathParam("iata") String iataCode, @PathParam("radius") String radiusString) {
+        if(iataCode != null) {
+            iataCode = iataCode.toUpperCase();
+        }
         try {
             new GenericInputRequestValidator().validate(
                     Arrays.asList("iata", "radius"),
@@ -130,10 +133,13 @@ public class RestWeatherQueryEndpoint implements WeatherQueryEndpoint {
             if(airportData != null) {
                 retval.add(informationDataStore.findAtmosphericInformation(airportData));
             } else {
-                retval.add(new AtmosphericInformation.Builder().build());
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
         } else {
             AirportData ref = informationDataStore.findAirportData(iataCode);
+            if(ref == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
             for(AirportData airportData : informationDataStore.listAirports()) {
                 if (calculateDistance(ref, airportData) <= radius){
                     AtmosphericInformation ai = informationDataStore.findAtmosphericInformation(airportData);
