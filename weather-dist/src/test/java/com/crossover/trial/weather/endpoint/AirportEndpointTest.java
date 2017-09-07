@@ -163,7 +163,7 @@ public class AirportEndpointTest {
 
     private void assertNullItem(String iata) {
         Response response = _update.getAirport(iata);
-        assertEquals(200, response.getStatus());
+        assertEquals(404, response.getStatus());
         assertNull(response.getEntity());
     }
 }

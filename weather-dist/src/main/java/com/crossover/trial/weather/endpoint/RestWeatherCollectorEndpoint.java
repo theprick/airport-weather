@@ -1,5 +1,6 @@
 package com.crossover.trial.weather.endpoint;
 
+import com.crossover.trial.weather.data.FrequencyDataStore;
 import com.crossover.trial.weather.data.InformationDataStore;
 import com.crossover.trial.weather.model.*;
 import com.crossover.trial.weather.validation.DataPointWithType;
@@ -36,6 +37,9 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
     private static InformationDataStore informationDataStore
             = InformationDataStore.getInstance();
 
+    private static FrequencyDataStore frequencyDataStore =
+            FrequencyDataStore.getInstance();
+
     @Override
     @GET
     @Path("/ping")
@@ -62,6 +66,8 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
         AirportData airportData = informationDataStore.findAirportData(iataCode);
         if (airportData != null) {
             addDataPoint(airportData, pointType, gson.fromJson(datapointJson, DataPoint.class));
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.status(Response.Status.OK).build();
     }
@@ -89,7 +95,11 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
         AirportData ad = informationDataStore.findAirportData(iataCode);
-        return Response.status(Response.Status.OK).entity(ad).build();
+        if(ad != null) {
+            return Response.status(Response.Status.OK).entity(ad).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
     @Produces("application/json")
@@ -128,6 +138,7 @@ public class RestWeatherCollectorEndpoint implements WeatherCollectorEndpoint {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
         informationDataStore.deleteAirport(iataCode);
+        frequencyDataStore.deleteAirport(iataCode);
         return Response.status(Response.Status.OK).build();
     }
 

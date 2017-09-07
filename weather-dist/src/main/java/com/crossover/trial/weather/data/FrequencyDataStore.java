@@ -81,4 +81,8 @@ public class FrequencyDataStore {
     public int totalNumberOfRequests() {
         return requestFrequency.values().stream().mapToInt(AtomicInteger::intValue).sum();
     }
+
+    public void deleteAirport(String iataCode) {
+        requestFrequency.remove(iataCode);
+    }
 }
