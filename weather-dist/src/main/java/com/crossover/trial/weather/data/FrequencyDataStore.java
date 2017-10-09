@@ -47,14 +47,14 @@ public class FrequencyDataStore {
         synchronized (requestsLock) {
             requestFrequency.computeIfAbsent(iataCode, k -> new AtomicInteger(0));
         }
-        requestFrequency.get(iataCode).incrementAndGet();
+        requestFrequency.get(iataCode).getAndIncrement();
     }
 
     public void updateRadiusFrequency(Double radius) {
         synchronized (radiusLock) {
             radiusFrequency.computeIfAbsent(radius, k -> new AtomicInteger(0));
         }
-        radiusFrequency.get(radius).incrementAndGet();
+        radiusFrequency.get(radius).getAndIncrement();
     }
 
     public int getRequestFrequency(String iata){
